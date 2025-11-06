@@ -33,3 +33,4 @@ backend/*.pyc
 # Environment variables
 .env
 .env.local
+src/Data/ID&A_TECH.ipynb
