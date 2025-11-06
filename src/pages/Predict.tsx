@@ -330,7 +330,14 @@ const Predict = () => {
                     onClick={() => {
                       setPredictionResult(null);
                       setError(null);
-                      form.reset();
+                      form.reset({
+                        date: undefined,
+                        coursPlusHaut: "",
+                        coursPlusBas: "",
+                        coursOuverture: "",
+                        coursVeille: "",
+                        variation: "",
+                      });
                     }}
                     variant="outline"
                     className="mt-6"

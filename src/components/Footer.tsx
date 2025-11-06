@@ -4,9 +4,9 @@ const Footer = () => {
   return (
     <footer className="border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 mt-auto">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           {/* Brand Section */}
-          <div className="flex flex-col items-center md:items-start">
+          <div className="flex flex-col items-center">
             <h3 className="text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
               MASI Predictor
             </h3>
@@ -16,7 +16,7 @@ const Footer = () => {
           </div>
 
           {/* Contact Information */}
-          <div className="flex flex-col items-center md:items-start">
+          <div className="flex flex-col items-center">
             <h4 className="text-sm font-semibold mb-4 text-foreground">Contact Information</h4>
             <div className="space-y-3">
               <a
@@ -37,9 +37,9 @@ const Footer = () => {
           </div>
 
           {/* Social Media Links */}
-          <div className="flex flex-col items-center md:items-start">
+          <div className="flex flex-col items-center">
             <h4 className="text-sm font-semibold mb-4 text-foreground">Follow Me</h4>
-            <div className="flex space-x-4 justify-center md:justify-start">
+            <div className="flex space-x-4 justify-center">
               <a
                 href="https://github.com/ayoubdaoudixx"
                 target="_blank"
