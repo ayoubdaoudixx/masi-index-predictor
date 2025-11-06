@@ -42,7 +42,7 @@ const Navbar = () => {
 
             {/* GitHub Link */}
             <a
-              href="https://github.com/ayoubdaoudixx/stock-spark-form"
+              href="https://github.com/ayoubdaoudixx/masi-index-predictor"
               target="_blank"
               rel="noopener noreferrer"
               className="text-black/70 hover:text-black dark:text-white/70 dark:hover:text-white transition-colors"
