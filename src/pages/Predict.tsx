@@ -2,7 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, TrendingUp, AlertCircle, RefreshCw } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -22,6 +23,9 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { predictMASI, validatePredictionInput, PredictionResult } from "@/services/predictionService";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const predictionSchema = z.object({
   date: z.date({
@@ -52,11 +56,19 @@ const predictionSchema = z.object({
 type PredictionFormValues = z.infer<typeof predictionSchema>;
 
 const Predict = () => {
+  const [predictionResult, setPredictionResult] = useState<PredictionResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const form = useForm<PredictionFormValues>({
     resolver: zodResolver(predictionSchema),
   });
 
-  const onSubmit = (data: PredictionFormValues) => {
+  const onSubmit = async (data: PredictionFormValues) => {
+    setIsLoading(true);
+    setError(null);
+    setPredictionResult(null);
+
     const formattedData = {
       date: format(data.date, "yyyy-MM-dd"),
       coursPlusHaut: parseFloat(data.coursPlusHaut),
@@ -66,12 +78,31 @@ const Predict = () => {
       variation: parseFloat(data.variation),
     };
 
-    console.log("Prediction data:", formattedData);
-    
-    toast({
-      title: "Prediction Generated",
-      description: "Your prediction request has been submitted successfully.",
-    });
+    // Validate input
+    const validation = validatePredictionInput(formattedData);
+    if (!validation.valid) {
+      setError(validation.errors.join(", "));
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const result = await predictMASI(formattedData);
+      setPredictionResult(result);
+      toast({
+        title: "Prediction Generated",
+        description: "Your MASI prediction has been calculated successfully.",
+      });
+    } catch (err) {
+      setError("Failed to generate prediction. Please try again.");
+      toast({
+        title: "Prediction Failed",
+        description: "An error occurred while generating the prediction.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -261,17 +292,70 @@ const Predict = () => {
                 {/* Submit Button */}
                 <Button
                   type="submit"
-                  className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
+                  disabled={isLoading}
+                  className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
-                  Generate Prediction
+                  {isLoading ? "Generating..." : "Generate Prediction"}
                 </Button>
               </form>
             </Form>
           </div>
 
+          {/* Prediction Result */}
+          {predictionResult && (
+            <Card className="mt-8 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                  Prediction Result
+                </CardTitle>
+                <CardDescription>
+                  Generated on {new Date(predictionResult.timestamp).toLocaleString()}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground mb-2">Predicted MASI Index Value</p>
+                  <p className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    {predictionResult.predictedValue.toFixed(2)}
+                  </p>
+                  {predictionResult.confidence && (
+                    <p className="text-sm text-muted-foreground mt-4">
+                      Confidence: {(predictionResult.confidence * 100).toFixed(1)}%
+                    </p>
+                  )}
+                  
+                  {/* Refresh Button */}
+                  <Button
+                    onClick={() => {
+                      setPredictionResult(null);
+                      setError(null);
+                      form.reset();
+                    }}
+                    variant="outline"
+                    className="mt-6"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Predict Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Error Alert */}
+          {error && (
+            <Alert variant="destructive" className="mt-8">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
           {/* Info Note */}
           <div className="mt-8 text-center text-sm text-muted-foreground">
             <p>All fields are required. Ensure accurate data entry for optimal predictions.</p>
+            <p className="mt-2 text-xs">Model: Linear Regression (fit_intercept=True, copy_x=True)</p>
           </div>
         </div>
       </div>

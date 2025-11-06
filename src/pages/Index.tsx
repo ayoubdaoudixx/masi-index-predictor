@@ -8,17 +8,13 @@ const Index = () => {
       <div className="container mx-auto px-4 py-20">
         {/* Hero Section */}
         <div className="text-center max-w-4xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <TrendingUp className="w-4 h-4" />
-            AI-Powered Market Analysis
-          </div>
           
           <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
-            Market Prediction Platform
+            MASI Prediction Engine
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-            Advanced algorithms analyzing trading patterns to deliver accurate market predictions
+            Advanced algorithms analyzing trading patterns to deliver accurate MASI Index Value predictions
           </p>
           
           <Link to="/predict">
